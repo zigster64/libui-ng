@@ -1,5 +1,4 @@
 const std = @import("std");
-const builtin = @import("builtin");
 
 pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
@@ -23,6 +22,7 @@ pub fn build(b: *std.Build) void {
     lib.addIncludePath(.{ .path = "common" });
     lib.installHeader("ui.h", "ui.h");
     lib.defineCMacro("libui_EXPORTS", "");
+    if (!is_dynamic) lib.defineCMacro("_UI_STATIC", "");
     lib.addCSourceFiles(.{
         .files = &.{
             "common/areaevents.c",
@@ -198,7 +198,7 @@ pub fn build(b: *std.Build) void {
                 "windows/winpublic.cpp",
                 "windows/winutil.cpp",
             },
-            .flags = if (is_dynamic) &.{} else &.{"-D_UI_STATIC"},
+            .flags = &.{},
         });
     } else {
         // assume unix/*.c backend
@@ -285,12 +285,10 @@ pub fn build(b: *std.Build) void {
             .root_source_file = .{ .path = example },
         });
         exe.linkLibrary(lib);
-        if (target.isWindows()) {
-            exe.addWin32ResourceFile(.{
-                .file = .{ .path = "examples/resources.rc" },
-                .flags = if (is_dynamic) &.{} else &.{ "/d", "_UI_STATIC" },
-            });
-        }
+        exe.addWin32ResourceFile(.{
+            .file = .{ .path = "examples/resources.rc" },
+            .flags = if (is_dynamic) &.{} else &.{ "/d", "_UI_STATIC" },
+        });
         b.installArtifact(exe);
     }
 
@@ -305,13 +303,10 @@ pub fn build(b: *std.Build) void {
         });
         exe.linkLibrary(lib);
         exe.linkLibCpp();
-
-        if (target.isWindows()) {
-            exe.addWin32ResourceFile(.{
-                .file = .{ .path = "examples/resources.rc" },
-                .flags = if (is_dynamic) &.{} else &.{ "/d", "_UI_STATIC" },
-            });
-        }
+        exe.addWin32ResourceFile(.{
+            .file = .{ .path = "examples/resources.rc" },
+            .flags = if (is_dynamic) &.{} else &.{ "/d", "_UI_STATIC" },
+        });
 
         b.installArtifact(exe);
     }
