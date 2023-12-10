@@ -158,13 +158,11 @@ struct uiArea {
     case NSEventTypeOtherMouseDown:
       me.Down = buttonNumber;
       me.Count = [e clickCount];
-      printf("Button %d down\n", me.Down);
       break;
     case NSEventTypeLeftMouseUp:
     case NSEventTypeRightMouseUp:
     case NSEventTypeOtherMouseUp:
       me.Up = buttonNumber;
-      printf("Button %d up\n", me.Down);
       break;
     case NSEventTypeLeftMouseDragged:
     case NSEventTypeRightMouseDragged:
@@ -172,7 +170,6 @@ struct uiArea {
       // we include the button that triggered the dragged event in the Held
       // fields
       buttonNumber = 0;
-      printf("Button dragged\n");
       break;
     }
   } else {
@@ -195,7 +192,6 @@ struct uiArea {
   me.Modifiers = [self parseModifiers:e];
 
   pmb = [NSEvent pressedMouseButtons];
-  printf("pmb %d\n", pmb);
   me.Held1To64 = 0;
   if (buttonNumber != 1 && (pmb & 1) != 0)
     me.Held1To64 |= 1;
